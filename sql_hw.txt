@@ -1,31 +1,31 @@
-1  Определить общее число книг.
+1  РћРїСЂРµРґРµР»РёС‚СЊ РѕР±С‰РµРµ С‡РёСЃР»Рѕ РєРЅРёРі.
 
 Select count(*) from book
 
-2  Определить число экземпляров книг каждого стиля.
+2  РћРїСЂРµРґРµР»РёС‚СЊ С‡РёСЃР»Рѕ СЌРєР·РµРјРїР»СЏСЂРѕРІ РєРЅРёРі РєР°Р¶РґРѕРіРѕ СЃС‚РёР»СЏ.
 
 Select ID_STYLE, count(*) from book group by ID_STYLE
 
-3  Определить книги авторов Буч и Рамбо, написанные ими двоими в соавторстве (без других соавторов).
+3  РћРїСЂРµРґРµР»РёС‚СЊ РєРЅРёРіРё Р°РІС‚РѕСЂРѕРІ Р‘СѓС‡ Рё Р Р°РјР±Рѕ, РЅР°РїРёСЃР°РЅРЅС‹Рµ РёРјРё РґРІРѕРёРјРё РІ СЃРѕР°РІС‚РѕСЂСЃС‚РІРµ (Р±РµР· РґСЂСѓРіРёС… СЃРѕР°РІС‚РѕСЂРѕРІ).
 
 Select * from book as c join 
 (Select ID_BOOK, count(ID_BOOK) as count, NAME_AUTHOR from book_author as a join 
 (Select * from author where NAME_AUTHOR like "%Buch" or NAME_AUTHOR like "%Rambo") as b 
 on a.ID_AUTHOR = b.ID_AUTHOR GROUP bY ID_BOOK) as d on c.ID_BOOK = d.ID_BOOK where d.count > 1
 
-4  Определить ФИО самых активных читателей. Активные - это те, у кого количество прочитанных/читаемых книг больше среднего по всем читателям.
+4  РћРїСЂРµРґРµР»РёС‚СЊ Р¤РРћ СЃР°РјС‹С… Р°РєС‚РёРІРЅС‹С… С‡РёС‚Р°С‚РµР»РµР№. РђРєС‚РёРІРЅС‹Рµ - СЌС‚Рѕ С‚Рµ, Сѓ РєРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕС‡РёС‚Р°РЅРЅС‹С…/С‡РёС‚Р°РµРјС‹С… РєРЅРёРі Р±РѕР»СЊС€Рµ СЃСЂРµРґРЅРµРіРѕ РїРѕ РІСЃРµРј С‡РёС‚Р°С‚РµР»СЏРј.
 
 select * from
 (SELECT ID_READER, count(ID_READER) as books FROM reader_book group by ID_READER) 
 as a where books > (Select avg(ID_READER) from reader_book)
 
-5  Определить читателей, ни разу не читавших книги стиля «розовые сопли».
+5  РћРїСЂРµРґРµР»РёС‚СЊ С‡РёС‚Р°С‚РµР»РµР№, РЅРё СЂР°Р·Сѓ РЅРµ С‡РёС‚Р°РІС€РёС… РєРЅРёРіРё СЃС‚РёР»СЏ В«СЂРѕР·РѕРІС‹Рµ СЃРѕРїР»РёВ».
 
 Select distinct Name_Reader from reader left join 
 (Select ID_READER from reader_book join
 (select ID_BOOK_EXAMPLE from book_example join
 (Select ID_BOOK, book.ID_STYLE from book join 
-(Select id_style FROM library.style where name_style not like "розовые сопли") 
+(Select id_style FROM library.style where name_style not like "СЂРѕР·РѕРІС‹Рµ СЃРѕРїР»Рё") 
 as style on book.ID_STYLE = style.ID_STYLE)
 as b on book_example.ID_BOOK = b.ID_BOOK)
 as s on reader_book.ID_BOOK_EXAMPLE = s.ID_BOOK_EXAMPLE)
