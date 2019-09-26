@@ -1,4 +1,4 @@
-1  Определить общее число книг.
+﻿1  Определить общее число книг.
 
 Select count(*) from book
 
@@ -25,16 +25,11 @@ and ba.ID_BOOK in (select ID_BOOK from author as a inner join BOOK_AUTHOR as ba 
 
 select * from
 (SELECT ID_READER, count(ID_READER) as books FROM reader_book group by ID_READER) 
-as a where books > (Select avg(ID_READER) from reader_book)
+as a where books > (Select avg(books) from
+(Select ID_READER, count(ID_READER) as books from reader_book group by ID_READER) as a)
 
 6  Определить читателей, ни разу не читавших книги стиля «розовые сопли».
 
-WITH book_author as (SELECT ID_AUTHOR, ID_BOOK FROM BOOK_AUTHOR),
-book_count as (SELECT count(1) as count, ID_BOOK FROM book_author GROUP BY ID_BOOK),
-author as (SELECT ID_AUTHOR, NAME_AUTHOR FROM AUTHOR WHERE AUTHOR.NAME_AUTHOR Like '%Buch' or AUTHOR.NAME_AUTHOR Like '%Rambo')
-SELECT book_author.ID_AUTHOR, book_author.ID_BOOK, author.NAME_AUTHOR FROM book_author
-LEFT JOIN book_count ON book_author.ID_BOOK = book_count.ID_BOOK
-INNER JOIN author on book_author.ID_AUTHOR = author.ID_AUTHOR WHERE Count = 2
 
 
 
@@ -61,8 +56,14 @@ group by NAME_AUTHOR having count(NAME_AUTHOR)=1;
 
 10 Определить самые популярные книги
 
-
+Select id_book_example, count(id_book_example) as num from
+(Select  id_reader, id_book_example from reader_book) as a group by id_book_example order by num desc limit 5
 
 11 Определить ФИО читателей, которые читают книги только одного стиля
 
-
+Select NAME_READER, ID_AUTHOR from reader join
+(Select distinct ID_READER, ID_AUTHOR from reader_book as c join
+(select ID_BOOK_EXAMPLE, Id_Author from book_example as a join
+(Select ID_AUTHOR, ID_BOOK from book_author) as b on a.ID_BOOK = b.ID_BOOK) 
+as d on c.ID_BOOK_EXAMPLE = d.ID_BOOK_EXAMPLE) as e on e.ID_READER = reader.ID_READER 
+group by NAME_READER having count(NAME_READER)=1
