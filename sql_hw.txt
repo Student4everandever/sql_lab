@@ -18,7 +18,7 @@ group by ba.ID_BOOK
 having count = 2
 and ba.ID_BOOK in (select ID_BOOK from author as a inner join BOOK_AUTHOR as ba on ba.ID_AUTHOR = a.ID_AUTHOR where NAME_AUTHOR = 'Grady Buch' )
 and ba.ID_BOOK in (select ID_BOOK from author as a inner join BOOK_AUTHOR as ba on ba.ID_AUTHOR = a.ID_AUTHOR where NAME_AUTHOR = 'John Rambo');
-
+ 
 
 
 5  Определить ФИО самых активных читателей. Активные - это те, у кого количество прочитанных/читаемых книг больше среднего по всем читателям.
@@ -56,14 +56,14 @@ group by NAME_AUTHOR having count(NAME_AUTHOR)=1;
 
 10 Определить самые популярные книги
 
-Select id_book_example, count(id_book_example) as num from
-(Select  id_reader, id_book_example from reader_book) as a group by id_book_example order by num desc limit 5
+WITH alias as (SELECT id_book_example, COUNT(id_book_example) as num
+FROM reader_book GROUP BY id_book_example) 
+Select * from alias where num in (Select max(num) from alias )
 
 11 Определить ФИО читателей, которые читают книги только одного стиля
 
-Select NAME_READER, ID_AUTHOR from reader join
-(Select distinct ID_READER, ID_AUTHOR from reader_book as c join
-(select ID_BOOK_EXAMPLE, Id_Author from book_example as a join
-(Select ID_AUTHOR, ID_BOOK from book_author) as b on a.ID_BOOK = b.ID_BOOK) 
-as d on c.ID_BOOK_EXAMPLE = d.ID_BOOK_EXAMPLE) as e on e.ID_READER = reader.ID_READER 
-group by NAME_READER having count(NAME_READER)=1
+Select NAME_READER, count(ID_STYLE) as Styles from
+(Select a.ID_READER, c.ID_STYLE from reader_book as a left join
+book_example as b on a.ID_BOOK_EXAMPLE = b.ID_BOOK_EXAMPLE left join 
+book as c on b.ID_BOOK = c.ID_BOOK group by ID_READER, ID_STYLE) as d left join
+reader as e on d.ID_READER = e.ID_READER group by d.ID_READER having Styles = 1 
